@@ -1,0 +1,13 @@
+[package]
+
+name = "Rust-Base58"
+version = "0.0.1"
+
+authors = ["Olivier PEREZ <olivier@olivierperez.fr>"]
+tags = []
+
+[[lib]]
+
+name = "Rust-Base58"
+path = "src/lib.rs"
+
