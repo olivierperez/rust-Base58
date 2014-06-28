@@ -1,4 +1,4 @@
-#![crate_id = "Rust-Base58"]
+#![crate_id = "base58"]
 #![crate_type = "rlib"]
 #![license = "Apache License, Version 2.0"]
 #![deny(missing_doc)]
