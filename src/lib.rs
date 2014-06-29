@@ -11,7 +11,7 @@ static BASE_58:u16 = 58;
 /// Encode a String into base58 String.
 pub fn encode_base58 (input: String) -> String {
   let mut copied = input.into_bytes();
-  let mut output:Vec<u8> = vec!();
+  let mut output:Vec<u8> = Vec::with_capacity(copied.len() * 138 / 100 + 1);
   let len = copied.len();
 
   if len == 0 {
