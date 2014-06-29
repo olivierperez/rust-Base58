@@ -9,6 +9,16 @@ static BASE_256:u16 = 256;
 static BASE_58:u16 = 58;
 
 /// Encode a String into base58 String.
+/// 
+/// ```rust{.example}
+/// extern crate base58;
+/// use base58::encode_base58;
+/// 
+/// fn main() {
+///   let encoded = encode_base58(String::from_str("azerty"));
+///   println!("encoded: {}",encoded); // will print "encoded: qYPmmAqv"
+/// }
+/// ```
 pub fn encode_base58 (input: String) -> String {
   let mut copied = input.into_bytes();
   let mut output:Vec<u8> = Vec::with_capacity(copied.len() * 138 / 100 + 1);
