@@ -20,7 +20,7 @@ pub fn encode_base58 (input: String) -> String {
 
   let mut count = 0;
   while count < len {
-    let modulo = divide_mode58(&mut copied);
+    let modulo = divide_mode58(&mut copied, count);
     let letter = from_alphabet(modulo);
     output.unshift(letter);
 
@@ -43,12 +43,11 @@ fn from_alphabet(position: u16) -> u8 {
 /// This function make the division of a big number stored in a Vec
 /// and returns the modulo of the division.
 /// The given Vec is modified and becomes the result of the division.
-fn divide_mode58(input: &mut Vec<u8>) -> u16 {
+fn divide_mode58(input: &mut Vec<u8>, start: uint) -> u16 {
   let mut remainder = 0;
 
-  for x in input.mut_iter() {
-
-    let num_base256: u16 = (*x as u16) & 255;
+  for x in input.mut_iter().skip(start) {
+    let num_base256: u16 = (*x as u16) & 0xFF;
     let temp = remainder * BASE_256 + num_base256;
     *x = (temp / BASE_58) as u8;
     remainder = temp % BASE_58;
@@ -57,9 +56,22 @@ fn divide_mode58(input: &mut Vec<u8>) -> u16 {
   remainder
 }
 
+#[cfg(test)] // TODO Put this test to test.rs file
+mod bench {
+  extern crate test;
+  use self::test::Bencher;
+  use super::encode_base58;
+
+  #[bench]
+  fn encode_lorem_ispum(b: &mut Bencher) {
+    b.iter(|| encode_base58(String::from_str("Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")));
+  }
+}
+
 #[cfg(test)]
 mod tests {
   mod tests_encode_base58 {
+
     use super::super::encode_base58;
 
     #[test] // TODO Put this test to test.rs file
@@ -90,7 +102,7 @@ mod tests {
       let mut input = vec!(0u8, 0, 0, 0);
 
       // When
-      let modulo = divide_mode58(&mut input);
+      let modulo = divide_mode58(&mut input, 0);
 
       // Then
       assert_eq!(*input.get(0), 0);
@@ -106,7 +118,7 @@ mod tests {
       let mut input = vec!(100u8, 43);
 
       // When
-      let modulo = divide_mode58(&mut input);
+      let modulo = divide_mode58(&mut input, 0);
 
       // Then
       assert_eq!(*input.get(0), 1);
