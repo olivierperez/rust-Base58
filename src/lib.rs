@@ -22,12 +22,14 @@ pub fn encode_base58 (input: String) -> String {
   while count < len {
     let modulo = divide_mode58(&mut copied, count);
     let letter = from_alphabet(modulo);
-    output.unshift(letter);
+    output.push(letter);
 
     if *copied.get(count) == 0 {
       count += 1;
     }
   }
+
+  output.reverse();
 
   match String::from_utf8(output) {
     Ok(result) => result,
