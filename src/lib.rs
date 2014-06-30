@@ -61,29 +61,27 @@ fn index_of_letter(letter: char) -> Option<uint> {
 /// and returns the modulo of the division.
 /// The given Vec is modified and becomes the result of the division.
 fn divide_by_58(input: &mut Vec<u8>, start: uint) -> u16 {
-  let mut remainder = 0;
-
-  for x in input.mut_iter().skip(start) {
-    let num_base256: u16 = (*x as u16) & 0xFF;
-    let temp = remainder * BASE_256 + num_base256;
-    *x = (temp / BASE_58) as u8;
-    remainder = temp % BASE_58;
-  }
-
-  remainder
+  division(input, start, BASE_58, BASE_256)
 }
 
 /// This function make the division by 58 of a big number stored in a Vec
 /// and returns the modulo of the division.
 /// The given Vec is modified and becomes the result of the division.
 fn divide_by_256(input: &mut Vec<u8>, start: uint) -> u16 {
+  division(input, start, BASE_256, BASE_58)
+}
+
+/// This function make the division by [divider] of a big number [base] based stored in a Vec
+/// and returns the modulo of the division.
+/// The given Vec is modified and becomes the result of the division.
+fn division(input: &mut Vec<u8>, start: uint, divider: u16, base: u16) -> u16 {
   let mut remainder = 0;
 
   for x in input.mut_iter().skip(start) {
     let num_base58: u16 = (*x as u16) & 0xFF;
-    let temp = remainder * BASE_58 + num_base58;
-    *x = (temp / BASE_256) as u8;
-    remainder = temp % BASE_256;
+    let temp = remainder * base + num_base58;
+    *x = (temp / divider) as u8;
+    remainder = temp % divider;
   }
 
   remainder
