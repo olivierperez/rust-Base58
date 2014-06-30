@@ -30,7 +30,7 @@ pub fn encode_base58 (input: String) -> String {
 
   let mut count = 0;
   while count < len {
-    let modulo = divide_mode58(&mut copied, count);
+    let modulo = divide_by_58(&mut copied, count);
     let letter = from_alphabet(modulo);
     output.push(letter);
 
@@ -52,10 +52,10 @@ fn from_alphabet(position: u16) -> u8 {
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".char_at(position as uint) as u8
 }
 
-/// This function make the division of a big number stored in a Vec
+/// This function make the division by 256 of a big number stored in a Vec
 /// and returns the modulo of the division.
 /// The given Vec is modified and becomes the result of the division.
-fn divide_mode58(input: &mut Vec<u8>, start: uint) -> u16 {
+fn divide_by_58(input: &mut Vec<u8>, start: uint) -> u16 {
   let mut remainder = 0;
 
   for x in input.mut_iter().skip(start) {
@@ -68,18 +68,37 @@ fn divide_mode58(input: &mut Vec<u8>, start: uint) -> u16 {
   remainder
 }
 
+/// This function make the division by 58 of a big number stored in a Vec
+/// and returns the modulo of the division.
+/// The given Vec is modified and becomes the result of the division.
+fn divide_by_256(input: &mut Vec<u8>, start: uint) -> u16 {
+  let mut remainder = 0;
+
+  for x in input.mut_iter().skip(start) {
+    let num_base58: u16 = (*x as u16) & 0xFF;
+    let temp = remainder * BASE_58 + num_base58;
+    *x = (temp / BASE_256) as u8;
+    remainder = temp % BASE_256;
+  }
+
+  remainder
+}
+
 #[cfg(test)]
 mod tests {
 
-  use super::divide_mode58;
+  use super::divide_by_256;
+  use super::divide_by_58;
+
+	/* Divisions by 256 */
 
   #[test]
-  fn should_divide_zero_without_modulo() {
+  fn should_divide_zero_by_58_without_modulo() {
     // Given
     let mut input = vec!(0u8, 0, 0, 0);
 
     // When
-    let modulo = divide_mode58(&mut input, 0);
+    let modulo = divide_by_58(&mut input, 0);
 
     // Then
     assert_eq!(*input.get(0), 0);
@@ -90,17 +109,50 @@ mod tests {
   }
 
   #[test]
-  fn should_divide_100_43_without_modulo() {
+  fn should_divide_100_43_by_58_with_modulo_7() {
     // Given
     let mut input = vec!(100u8, 43);
 
     // When
-    let modulo = divide_mode58(&mut input, 0);
+    let modulo = divide_by_58(&mut input, 0);
 
     // Then
     assert_eq!(*input.get(0), 1);
     assert_eq!(*input.get(1), 186);
     assert_eq!(modulo, 7);
+  }
+
+	/* Divisions by 58 */
+
+  #[test]
+  fn should_divide_zero_by_256_without_modulo() {
+    // Given
+    let mut input = vec!(0u8, 0, 0, 0);
+
+    // When
+    let modulo = divide_by_256(&mut input, 0);
+
+    // Then
+    assert_eq!(*input.get(0), 0);
+    assert_eq!(*input.get(1), 0);
+    assert_eq!(*input.get(2), 0);
+    assert_eq!(*input.get(3), 0);
+    assert_eq!(modulo, 0);
+  }
+
+  #[test]
+  fn should_divide_100_43_by_256_with_modulo_228() {
+    // Given
+    let mut input = vec!(13u8, 12, 88);
+
+    // When
+    let modulo = divide_by_256(&mut input, 0);
+
+    // Then
+    assert_eq!(*input.get(0), 0);
+    assert_eq!(*input.get(1), 2);
+    assert_eq!(*input.get(2), 57);
+    assert_eq!(modulo, 228);
   }
 
 }
