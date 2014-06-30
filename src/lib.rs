@@ -52,6 +52,11 @@ fn from_alphabet(position: u16) -> u8 {
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".char_at(position as uint) as u8
 }
 
+/// Give the index of a letter in the alphabet
+fn index_of_letter(letter: char) -> Option<uint> {
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".find(letter)
+}
+
 /// This function make the division by 256 of a big number stored in a Vec
 /// and returns the modulo of the division.
 /// The given Vec is modified and becomes the result of the division.
@@ -89,8 +94,10 @@ mod tests {
 
   use super::divide_by_256;
   use super::divide_by_58;
+  use super::from_alphabet;
+  use super::index_of_letter;
 
-	/* Divisions by 256 */
+  /* Divisions by 256 */
 
   #[test]
   fn should_divide_zero_by_58_without_modulo() {
@@ -122,7 +129,7 @@ mod tests {
     assert_eq!(modulo, 7);
   }
 
-	/* Divisions by 58 */
+  /* Divisions by 58 */
 
   #[test]
   fn should_divide_zero_by_256_without_modulo() {
@@ -153,6 +160,32 @@ mod tests {
     assert_eq!(*input.get(1), 2);
     assert_eq!(*input.get(2), 57);
     assert_eq!(modulo, 228);
+  }
+
+  #[test]
+  fn should_find_right_letters_from_alphabet() {
+    // Given
+
+    // When
+    let letter_1 = from_alphabet(0);
+    let letter_A = from_alphabet(9);
+
+    // Then
+    assert_eq!(letter_1, 49u8);
+    assert_eq!(letter_A, 65u8);
+  }
+
+  #[test]
+  fn should_find_right_index_into_alphabet() {
+    // Given
+
+    // When
+    let index_1 = index_of_letter('1').unwrap_or(255);
+    let index_A = index_of_letter('A').unwrap_or(255);
+
+    // Then
+    assert_eq!(index_1, 0);
+    assert_eq!(index_A, 9);
   }
 
 }
